@@ -6,10 +6,15 @@ import { complexInputTool } from "./tools/complex-input.js";
 import { asyncOperationTool } from "./tools/async-operation.js";
 import { externalApiTool } from "./tools/external-api.js";
 import { fileOperationTool } from "./tools/file-operation.js";
+import { imageGenerationTool } from "./tools/image-generation-OpenAI.js";
+import { imageEditTool } from "./tools/image-edit-OpenAI.js";
+
+type TextContent = { type: "text"; text: string };
+type ImageContent = { type: "image"; data: string; mimeType: "image/png" | "image/jpeg" | "image/webp" };
 
 export interface ToolResult {
   [key: string]: unknown;
-  content: { type: "text"; text: string }[];
+  content: (TextContent | ImageContent)[];
   isError?: boolean;
 }
 
@@ -27,6 +32,8 @@ const tools: ToolDefinition<any>[] = [
   asyncOperationTool,
   externalApiTool,
   fileOperationTool,
+  imageGenerationTool,
+  imageEditTool,
 ];
 
 export function createServer(): McpServer {
@@ -35,9 +42,12 @@ export function createServer(): McpServer {
     version: "1.0.0",
   });
 
-  // Register all tools
   for (const tool of tools) {
-    server.tool(tool.name, tool.description, tool.inputSchema.shape, tool.handler);
+    server.registerTool(
+      tool.name,
+      { description: tool.description, inputSchema: tool.inputSchema.shape },
+      tool.handler
+    );
   }
 
   return server;

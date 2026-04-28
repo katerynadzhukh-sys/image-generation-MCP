@@ -2,6 +2,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createServer } from "./server.js";
 import { createServer as createHttpServer } from "node:http";
+import "dotenv/config";
+
 
 function getTransport(): "stdio" | "sse" {
   const fromArg = process.argv.find((a) => a.startsWith("--transport="));
